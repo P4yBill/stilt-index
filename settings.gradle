@@ -1,0 +1,4 @@
+rootProject.name = 'stilt-index'
+include 'stilt:core'
+include 'stilt:demo'
+

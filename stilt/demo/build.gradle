@@ -1,0 +1,19 @@
+plugins {
+//    id 'java'
+    id 'application'
+}
+
+group 'com.p4ybill.stilt.demo'
+
+dependencies {
+    implementation project(':stilt:core')
+}
+
+run {
+    standardInput = System.in
+}
+
+application {
+    mainClassName = 'com.p4ybill.stilt.Main'
+}
+

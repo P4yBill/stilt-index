@@ -1,0 +1,1 @@
+gradlew :stilt:demo:run
