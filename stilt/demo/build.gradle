@@ -7,6 +7,11 @@ group 'com.p4ybill.stilt.demo'
 
 dependencies {
     implementation project(':stilt:core')
+    compileOnly group: 'org.openjdk.jol', name: 'jol-core', version: '0.1'
+    implementation group: 'com.indeed', name: 'lsmtree-core', version: '1.0.7'
+    implementation group: 'commons-collections', name: 'commons-collections', version: '3.2.2'
+    implementation group: 'commons-codec', name: 'commons-codec', version: '1.3'
+    implementation group: 'org.codehaus.jackson', name: 'jackson-core-asl', version: '1.8.0'
 }
 
 run {

@@ -4,11 +4,12 @@ build
 .gradle/
 /bin
 /bin.*
-
+bin/
 # IDE
 .vscode
 .idea/
 /.project
+.project
 
 /eclipse-build
 /classes
@@ -19,3 +20,6 @@ lib
 /.settings
 /.caches
 .DS_Store
+.classpath
+.settings
+.caches
