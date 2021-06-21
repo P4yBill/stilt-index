@@ -1,35 +1,11 @@
 package com.p4ybill.stilt.index;
 
-public abstract class Node {
-    private Object leftChild;
-    private Object rightChild;
+public interface Node {
+    Edge getRightEdge();
 
-    private byte leftLength;
-    private byte leftPath;
-    private byte rightLength;
-    private byte rightPath;
+    Edge getLeftEdge();
 
-    public Object getLeftChild() {
-        return leftChild;
-    }
+    void setRightEdge(Edge edge);
 
-    public void setLeftChild(Object leftChild) {
-        this.leftChild = leftChild;
-    }
-
-    public Object getRightChild() {
-        return rightChild;
-    }
-
-    public void setRightChild(Object rightChild) {
-        this.rightChild = rightChild;
-    }
-
-    public abstract int getLeftLength();
-
-    public abstract long getLeftPath();
-
-    public abstract int getRightLength();
-
-    public abstract long getRightPath();
+    void setLeftEdge(Edge edge);
 }

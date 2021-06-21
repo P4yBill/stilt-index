@@ -32,8 +32,8 @@ public class SlimKey implements Key {
     }
 
     @Override
-    public long getTimestamp() {
-        return this.common.getTimestamp();
+    public long getDate() {
+        return this.common.getDate();
     }
 
     @Override
