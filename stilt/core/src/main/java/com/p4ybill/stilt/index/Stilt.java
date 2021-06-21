@@ -32,7 +32,6 @@ public class Stilt<K> {
 
 
     private long pathOf(K key) {
-        // Call a PathScheduler
         return pathScheduler.getKey(key);
     }
 
