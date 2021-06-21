@@ -51,11 +51,11 @@ public class KeywordUtils {
         return String.format("%-" + n + "s", s);
     }
 
-    public static String padWithNulls(String s, int n) {
+    private static String padWithNulls(String s, int n) {
         return padRight(s, n);
     }
 
-    public static String padRightZero(String inputString, int length) {
+    private static String padRightZero(String inputString, int length) {
         if (inputString.length() >= length) {
             return inputString;
         }

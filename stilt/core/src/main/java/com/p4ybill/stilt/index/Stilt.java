@@ -35,10 +35,6 @@ public class Stilt<K> {
         return pathScheduler.getKey(key);
     }
 
-    public Node getRoot() {
-        return root;
-    }
-
     public boolean insert(Node node, K key, int id) {
         if (node == null) {
             return false;
@@ -71,11 +67,14 @@ public class Stilt<K> {
         return true;
     }
 
+    public boolean insert(K key, int id){
+        return this.insert(root, key, id);
+    }
 
     private Node split(Edge edge, long path, int pathLen) {
         Node nodeO = edge.getChild();
         int lengthO = edge.getLength();
-        long pathO = edge.getLength();
+        long pathO = edge.getPath();
 
         int lengthC = BinaryUtils.clzBounded((path >> (pathLen - lengthO)) ^ pathO, lengthO);
 
@@ -120,7 +119,7 @@ public class Stilt<K> {
      * @return the edge's child node if the edge matched, otherwise null
      */
     private Node edgeMatchesPath(Edge edge, long path, int pathLen) {
-        if (edge.getPath() == path && pathLen == edge.getLength()) {
+        if (edge.getPath() == (path >>> (pathLen - edge.getLength()))) {
             return edge.getChild();
         }
 
@@ -130,6 +129,8 @@ public class Stilt<K> {
     private void putEdge(Node node, long path, int pathLen, Node nodeNext) {
         Edge edge = getRightSizedEdge(pathLen);
         edge.setChild(nodeNext);
+        edge.setPath(path);
+        edge.setLength(pathLen);
 
 
         if (BinaryUtils.isOneAtPosition(path, pathLen - 1)) {
@@ -147,13 +148,11 @@ public class Stilt<K> {
     }
 
     private Edge getRightSizedEdge(int pathLen) {
-        double w = (float) pathLen / bitPerDimension;
-
-        if (w <= 1) {
+        if (pathLen <= 8) {
             return new Edge8();
-        } else if (w <= 2) {
+        } else if (pathLen <= 16) {
             return new Edge16();
-        } else if (w <= 3) {
+        } else if (pathLen <= 32) {
             return new Edge32();
         } else {
             return new Edge64();
