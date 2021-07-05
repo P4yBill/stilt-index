@@ -4,17 +4,28 @@ import java.util.List;
 import java.util.Optional;
 
 public class Query {
-    Double minX;
-    Double maxX;
-    Double minY;
-    Double maxY;
+    private Double minX;
+    private Double maxX;
+    private Double minY;
+    private Double maxY;
 
-    Long minTimestamp;
-    Long maxTimestamp;
+    private Long minTimestamp;
+    private Long maxTimestamp;
 
-    List<String> words;
+    private String word;
 
-    public Query(){};
+    private Range rangeX;
+    private Range rangeY;
+    private Range rangeTimestamp;
+    private Range rangeWord;
+
+    private List<String> words;
+
+    protected Query(int bitsPerDimension) {
+        this.rangeX = SearchUtils.getRange(bitsPerDimension);
+        this.rangeY = SearchUtils.getRange(bitsPerDimension);
+        this.rangeTimestamp = SearchUtils.getRange(bitsPerDimension);
+    }
 
     public Optional<Double> getMinX() {
         return Optional.ofNullable(minX);
@@ -56,12 +67,20 @@ public class Query {
         this.minTimestamp = minTimestamp;
     }
 
-    public long getMaxTimestamp() {
-        return maxTimestamp;
+    public Optional<Long> getMaxTimestamp() {
+        return Optional.ofNullable(maxTimestamp);
     }
 
     public void setMaxTimestamp(Long maxTimestamp) {
         this.maxTimestamp = maxTimestamp;
+    }
+
+    public Optional<String> getWord() {
+        return Optional.ofNullable(word);
+    }
+
+    public void setWord(String word) {
+        this.word = word;
     }
 
     public Optional<List<String>> getWords() {
@@ -70,5 +89,70 @@ public class Query {
 
     public void setWords(List<String> words) {
         this.words = words;
+    }
+
+    public boolean intersects(Key key) {
+        return (this.getMinX().isEmpty() || key.getX() >= this.getMinX().get()) &&
+                (this.getMinY().isEmpty() || key.getY() >= this.getMinY().get()) &&
+                (this.getMaxX().isEmpty() || key.getX() <= this.getMaxX().get()) &&
+                (this.getMaxY().isEmpty() || key.getY() <= this.getMaxY().get()) &&
+
+                (this.getMinTimestamp().isEmpty() || key.getDate() >= this.getMinTimestamp().get()) &&
+                (this.getMaxTimestamp().isEmpty() || key.getDate() <= this.getMaxTimestamp().get()) &&
+
+                (this.getWord().isEmpty()) || this.getWord().get().equals(key.getKeyword());
+
+    }
+
+    public Range getRangeX() {
+        return rangeX;
+    }
+
+    public Range getRangeY() {
+        return rangeY;
+    }
+
+    public Range getRangeTimestamp() {
+        return rangeTimestamp;
+    }
+
+    public void setRangeX(Range rangeX) {
+        this.rangeX = rangeX;
+    }
+
+    public void setRangeY(Range rangeY) {
+        this.rangeY = rangeY;
+    }
+
+    public void setRangeTimestamp(Range rangeTimestamp) {
+        this.rangeTimestamp = rangeTimestamp;
+    }
+
+    public Range getRangeWord() {
+        return rangeWord;
+    }
+
+    public void setRangeWord(Range rangeWord) {
+        this.rangeWord = rangeWord;
+    }
+
+    public boolean intersects(Range range, int dimension){
+        Range dRange = getRangeForDimension(dimension);
+
+        return dRange != null && range.intersects(dRange);
+    }
+
+    public Range getRangeForDimension(int dimension){
+        if(dimension == 0){
+            return this.getRangeX();
+        }else if(dimension == 1){
+            return this.getRangeY();
+        }else if(dimension == 2){
+            return this.getRangeWord();
+        }else if(dimension == 3){
+            return this.getRangeTimestamp();
+        }
+
+        return null;
     }
 }

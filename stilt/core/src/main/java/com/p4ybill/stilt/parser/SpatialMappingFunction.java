@@ -4,7 +4,7 @@ public class SpatialMappingFunction implements MappingFunction {
 
     @Override
     public int map(Object value, int bits) {
-        float f = (Float) value;
+        double f = (Double) value;
         return (int)f;
     }
 }

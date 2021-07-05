@@ -2,15 +2,15 @@ package com.p4ybill.stilt.index;
 
 public class SlimCommon {
     private int id;
-    private float latitude;
-    private float longitude;
+    private double y;
+    private double x;
     private long date;
     private int totalWordFrequency;
 
-    public SlimCommon(int id, float latitude, float longitude, long date, int totalWordFrequency) {
+    public SlimCommon(int id, double y, double x, long date, int totalWordFrequency) {
         this.id = id;
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this.y = y;
+        this.x = x;
         this.date = date;
         this.totalWordFrequency = totalWordFrequency;
     }
@@ -19,12 +19,12 @@ public class SlimCommon {
         return id;
     }
 
-    public float getLatitude() {
-        return latitude;
+    public double getY() {
+        return y;
     }
 
-    public float getLongitude() {
-        return longitude;
+    public double getX() {
+        return x;
     }
 
     public long getDate() {

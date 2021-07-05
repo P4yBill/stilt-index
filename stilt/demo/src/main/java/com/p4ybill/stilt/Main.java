@@ -2,9 +2,13 @@ package com.p4ybill.stilt;
 
 import com.p4ybill.stilt.index.FlatKey;
 import com.p4ybill.stilt.index.Key;
+import com.p4ybill.stilt.index.Query;
 import com.p4ybill.stilt.index.Stilt;
 import com.p4ybill.stilt.parser.*;
 import com.p4ybill.stilt.utils.KeywordUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -16,9 +20,9 @@ public class Main {
                 .addMapper(new DateMappingFunction())
                 .build();
         SimplePathScheduler pathScheduler = new SimplePathScheduler(4, 64, dimensionMapper);
-
+//
         Stilt<Key> index = new Stilt<>(64, 4, null, pathScheduler);
-
+//
         Key flatKey = new FlatKey(1, 40, 50, "cheqer", 1624194064, 1, 1);
 
         index.insert(flatKey, 1);
@@ -26,47 +30,42 @@ public class Main {
         Key flatKey2 = new FlatKey(1, 40, 60, "cheqer", 1624194064, 1, 1);
 
         index.insert(flatKey2, 1);
-
         Key flatKey3 = new FlatKey(1, 40, 50, "cheqeroputa", 1624194064, 1, 1);
         index.insert(flatKey3, 1);
-    }
-
-    private static void testingStilt() {
-
-    }
 
 
-    private static void testingKeywordToBits() {
-        System.out.println(Integer.toBinaryString(KeywordUtils.keywordToBits("cheqer", 16)));
-    }
-    
-    public static int interleave(int a, int b) {
-        int ans = 0;
-        for (int i = 0; i < 32; i++) {
-            if ((a & (1 << i)) != 0)     // the bit at position i in a is 1
-            {
-                ans |= 1L << i * 2 + 1;  // set the bit at position (i*2 + 1) in ans to 1
-            }
-            if ((b & (1 << i)) != 0)     // the bit at position i in b is 1
-            {
-                ans |= 1L << i * 2;      // set the bit at position (i*2) in ans to 1
-            }
+
+//        Key flatKey = new FlatKey(1, 50, 40, "cheqer", 1624194064, 1, 1);
+//
+//        index.insert(flatKey, 1);
+//
+//        Key flatKey2 = new FlatKey(1, 60, 40, "cheqer", 1624194064, 1, 1);
+//
+//        index.insert(flatKey2, 1);
+
+
+
+
+        Query query = index.initQuery();
+//        query.setMinX(39d);
+//        query.setMinY(20d);
+//        query.setMaxX(61d);
+//        query.setMaxY(41d);
+        List<String> words = new ArrayList<>();
+//        words.add("chiquit");
+        words.add("cheqer");
+//        words.add("cheqeroputa");
+//        query.setWords(words);
+
+        query.setMinTimestamp(1624191000L);
+        query.setMaxTimestamp(1624197000L);
+
+        List<Key> res = index.rangeSearch(query);
+        for(Key key : res){
+            System.out.println(key.getKeyword());
         }
-        return ans;
-    }
+//
+        System.out.println(res.size());
 
-    public static int zOrdering(int x, int y) {
-        System.out.println("Leading zero: " + ((y & 0xff) >> 7));
-
-        int z = 0;
-
-        for (int i = 0; i < Integer.SIZE; i++) {
-            int x_masked_i = (x & (1 << i));
-            int y_masked_i = (y & (1 << i));
-
-            z |= (x_masked_i << i);
-            z |= (y_masked_i << (i + 1));
-        }
-        return z;
     }
 }

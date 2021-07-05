@@ -1,5 +1,7 @@
 package com.p4ybill.stilt.parser;
 
+import com.p4ybill.stilt.utils.Validators;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -68,9 +70,7 @@ public class DimensionMapper {
          * @return DimensionMapper
          */
         public DimensionMapper build() {
-            if (this.mappingFunctionsList.size() != this.dimensions) {
-                throw new IllegalArgumentException("The number of mapping functions should be equal to the number of dimensions");
-            }
+            Validators.checkArgument(this.mappingFunctionsList.size() == this.dimensions, "The number of mapping functions should be equal to the number of dimensions.");
 
             MappingFunction[] array = new MappingFunction[this.mappingFunctionsList.size()];
             DimensionMapper dm = new DimensionMapper(this.mappingFunctionsList.toArray(array));
