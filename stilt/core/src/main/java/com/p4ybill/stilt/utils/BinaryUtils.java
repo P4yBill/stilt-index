@@ -9,6 +9,14 @@ public class BinaryUtils {
         return (binaryNum & 0x80) >>> 7;
     }
 
+    public static int lsb(int b) {
+        return b & 1;
+    }
+
+    public static long lsb(long b) {
+        return b & 1;
+    }
+
     public static int bitSetWithoutMsb(int binaryNum) {
         return unsetBit(binaryNum, 1);
     }
@@ -28,8 +36,21 @@ public class BinaryUtils {
     }
 
     public static boolean isOneAtPosition(long b, int length){
-        return (b >>> length) == 1;
+        return ((b >>> length) & 1) == 1;
     }
+
+    public static int getBitAtPosition(int b, int p){
+        return lsb((b >>> (p - 1)));
+    }
+
+    public static long getBitAtPosition(long b, int p){
+        return lsb((b >>> (p - 1)));
+    }
+
+    public static boolean isSetAtPosition(long b, int p){
+        return getBitAtPosition(b, p) == 1;
+    }
+
 
     /**
      * Trims the leading bits based on the given number

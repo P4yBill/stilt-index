@@ -17,13 +17,13 @@ public class SlimKey implements Key {
     }
 
     @Override
-    public float getLatitude() {
-        return this.common.getLatitude();
+    public double getY() {
+        return this.common.getY();
     }
 
     @Override
-    public float getLongitude() {
-        return this.common.getLongitude();
+    public double getX() {
+        return this.common.getX();
     }
 
     @Override

@@ -7,7 +7,7 @@ public class LeafNode<K> implements Node {
     private ArrayList<K> entries;
 
     public LeafNode() {
-        this.entries = new ArrayList();
+        this.entries = new ArrayList<>();
     }
 
     public LeafNode(K key){

@@ -4,8 +4,8 @@ public class FlatKey extends SlimCommon implements Key {
     String keyword;
     int keywordFrequency;
 
-    public FlatKey(int id, float latitude, float longitude, String keyword, long timestamp, int totalWordFrequency, int keywordFrequency) {
-        super(id, latitude, longitude, timestamp, totalWordFrequency);
+    public FlatKey(int id, double y, double x, String keyword, long timestamp, int totalWordFrequency, int keywordFrequency) {
+        super(id, y, x, timestamp, totalWordFrequency);
         this.keyword = keyword;
         this.keywordFrequency = keywordFrequency;
     }

@@ -8,9 +8,9 @@ public interface Key {
     int getId();
 
     // TODO: Create a more abstract representation of components.
-    float getLatitude();
+    double getY(); // y
 
-    float getLongitude();
+    double getX(); // x
 
     String getKeyword();
 

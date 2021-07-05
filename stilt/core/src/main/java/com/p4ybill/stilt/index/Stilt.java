@@ -5,34 +5,31 @@ import com.p4ybill.stilt.parser.PathScheduler;
 import com.p4ybill.stilt.store.LSMStorage;
 import com.p4ybill.stilt.utils.BinaryUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Stilt<K> {
     private Node root;
     private int numberOfDimensions;
     private int length;
     private LSMStorage<String> lsmStorage;
-    private DimensionMapper dimensionMapper;
-    private int bitPerDimension;
+    private int bitsPerDimension;
     private PathScheduler<K> pathScheduler;
 
     public Stilt(int length, int numberOfDimensions) {
         this.numberOfDimensions = numberOfDimensions;
         this.length = length;
-        this.bitPerDimension = length / numberOfDimensions;
+        this.bitsPerDimension = length / numberOfDimensions;
         this.root = new NonLeafNode();
     }
 
     public Stilt(int length, int numberOfDimensions, LSMStorage<String> lsmStorage, PathScheduler<K> pathScheduler) {
         this.numberOfDimensions = numberOfDimensions;
         this.length = length;
-        this.bitPerDimension = length / numberOfDimensions;
+        this.bitsPerDimension = length / numberOfDimensions;
         this.root = new NonLeafNode();
         this.lsmStorage = lsmStorage;
         this.pathScheduler = pathScheduler;
-    }
-
-
-    private long pathOf(K key) {
-        return pathScheduler.getKey(key);
     }
 
     public boolean insert(Node node, K key, int id) {
@@ -67,8 +64,96 @@ public class Stilt<K> {
         return true;
     }
 
-    public boolean insert(K key, int id){
+    public boolean insert(K key, int id) {
         return this.insert(root, key, id);
+    }
+
+    public Query initQuery() {
+        return new Query(this.bitsPerDimension);
+    }
+
+    public List<K> rangeSearch(Query query) {
+        List<K> entries = new ArrayList<>();
+        initQueryRanges(query);
+
+        RangeSearch<K> rangeSearch;
+        DimensionalRange dr;
+
+        if (query.getWords().isPresent()) {
+            List<String> words = query.getWords().get();
+            for (String w : words) {
+                query.setWord(w);
+                int mappedWord = pathScheduler.getMappedValue(w, 2);
+                query.setRangeWord(new Range(mappedWord, mappedWord));
+                dr = initWithFullRange(query);
+                rangeSearch = new RangeSearch<>(length, bitsPerDimension, numberOfDimensions);
+                List<K> l = rangeSearch.searchNode(root, query, 0, dr);
+                entries.addAll(l);
+            }
+        } else {
+            // String dimension is ignored
+            query.setRangeWord(null);
+            dr = initWithFullRange(query);
+            rangeSearch = new RangeSearch<>(length, bitsPerDimension, numberOfDimensions);
+            List<K> l = rangeSearch.searchNode(root, query, 0, dr);
+            entries.addAll(l);
+        }
+
+        return entries;
+    }
+
+    public DimensionalRange initWithFullRange(Query query) {
+        DimensionalRange.Builder drBuilder = new DimensionalRange.Builder(this.numberOfDimensions);
+        for (int i = 0; i < this.numberOfDimensions; i++) {
+            if (query.getRangeForDimension(i) != null) {
+                drBuilder.withRange(SearchUtils.getRange(this.bitsPerDimension));
+            } else {
+                drBuilder.withRange(null);
+            }
+        }
+
+        return drBuilder.build();
+    }
+
+    private void initQueryRanges(Query query) {
+        if (query.getMinX().isPresent() || query.getMaxX().isPresent()) {
+            if (query.getMinX().isPresent()) {
+                query.getRangeX().setLowerBound(pathScheduler.getMappedValue(query.getMinX().get(), 0));
+            }
+            if (query.getMaxX().isPresent()) {
+                query.getRangeX().setUpperBound(pathScheduler.getMappedValue(query.getMaxX().get(), 0));
+            }
+        } else {
+            query.setRangeX(null);
+        }
+
+        if (query.getMinY().isPresent() || query.getMaxY().isPresent()) {
+            if (query.getMinY().isPresent()) {
+                query.getRangeY().setLowerBound(pathScheduler.getMappedValue(query.getMinY().get(), 1));
+            }
+            if (query.getMaxY().isPresent()) {
+                query.getRangeY().setUpperBound(pathScheduler.getMappedValue(query.getMaxY().get(), 1));
+            }
+        } else {
+            query.setRangeY(null);
+        }
+
+        if (query.getMinTimestamp().isPresent() || query.getMaxTimestamp().isPresent()) {
+            if (query.getMinTimestamp().isPresent()) {
+                query.getRangeTimestamp().setLowerBound(pathScheduler.getMappedValue(query.getMinTimestamp().get(), 3));
+            }
+            if (query.getMaxTimestamp().isPresent()) {
+                query.getRangeTimestamp().setUpperBound(pathScheduler.getMappedValue(query.getMaxTimestamp().get(), 3));
+            }
+        } else {
+            query.setRangeTimestamp(null);
+        }
+
+
+    }
+
+    private long pathOf(K key) {
+        return pathScheduler.getKey(key);
     }
 
     private Node split(Edge edge, long path, int pathLen) {
@@ -97,7 +182,7 @@ public class Stilt<K> {
         edge.setChild(nodeC);
 
         // setEdge
-        if (BinaryUtils.isOneAtPosition(edgeNewPath, lengthNew - 1)) { // right
+        if (BinaryUtils.isSetAtPosition(edgeNewPath, lengthNew)) { // right
             nodeC.setRightEdge(edgeNew);
         } else {
             nodeC.setLeftEdge(edgeNew);
@@ -107,7 +192,7 @@ public class Stilt<K> {
     }
 
     private Edge pickEdge(Node node, long path, int pathLen) {
-        return BinaryUtils.isOneAtPosition(path, pathLen - 1) ? node.getRightEdge() : node.getLeftEdge();
+        return BinaryUtils.isSetAtPosition(path, pathLen) ? node.getRightEdge() : node.getLeftEdge();
     }
 
     /**
@@ -133,7 +218,7 @@ public class Stilt<K> {
         edge.setLength(pathLen);
 
 
-        if (BinaryUtils.isOneAtPosition(path, pathLen - 1)) {
+        if (BinaryUtils.isSetAtPosition(path, pathLen)) {
             node.setRightEdge(edge);
         } else {
             node.setLeftEdge(edge);
