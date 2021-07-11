@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-class RangeSearch<K> {
+class RangeSearch<K extends Key> {
     private int bitsPerDimension;
     private int dimensions;
     private int length;
@@ -67,8 +67,7 @@ class RangeSearch<K> {
             LeafNode<K> leafNode = (LeafNode<K>) node;
 
             for (K key : leafNode.getEntries()) {
-                Key key1 = (Key) key;
-                if (query.intersects(key1)) {
+                if (query.intersects(key)) {
                     entries.add(key);
                 }
             }

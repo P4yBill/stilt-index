@@ -5,7 +5,7 @@ public class Edge8 extends AbstractEdge {
 
     @Override
     public long getPath() {
-        return path;
+        return Byte.toUnsignedLong(this.path);
     }
 
     @Override

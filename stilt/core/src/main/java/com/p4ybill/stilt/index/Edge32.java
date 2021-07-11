@@ -5,7 +5,7 @@ public class Edge32 extends AbstractEdge {
 
     @Override
     public long getPath() {
-        return path;
+        return Integer.toUnsignedLong(this.path);
     }
 
     public void setPath(long path) {
