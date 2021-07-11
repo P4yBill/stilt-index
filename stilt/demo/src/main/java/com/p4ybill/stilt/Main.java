@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class Main {
@@ -51,11 +53,12 @@ public class Main {
         query.setMinY(730d);
         query.setMaxX(65535d);
         query.setMaxY(740d);
-//        List<String> words = new ArrayList<>();
-//        words.add("chiquit");
-//        words.add("cheqer");
-//        words.add("cheqeroputa");
-//        query.setWords(words);
+        List<String> words = new ArrayList<>();
+//        words.add("air_conditioning");
+//        words.add("wedding_services");
+//        words.add("internet_free");
+//        words.add("internet_wireless");
+        query.setWords(words);
 //
 //        query.setMinTimestamp(1624191000L);
 //        query.setMaxTimestamp(1624197000L);
@@ -72,7 +75,8 @@ public class Main {
         end = Instant.now();
         System.out.println("Range Search took: " + Duration.between(start, end).toMillis() + "ms");
 
-        ids.forEach(System.out::println);
+//        ids.forEach(System.out::println);
+        System.out.println(ids.size());
 
     }
 
