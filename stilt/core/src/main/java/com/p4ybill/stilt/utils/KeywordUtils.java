@@ -17,14 +17,14 @@ public class KeywordUtils {
         char[] arrChar = s.toCharArray();
 
         for (int i = 0; i < b / 5; i++) {
-            System.out.println("Char: " + arrChar[i] + " -- mapped to: " + Integer.toBinaryString(charToBits(arrChar[i])));
+//            System.out.println("Char: " + arrChar[i] + " -- mapped to: " + Integer.toBinaryString(charToBits(arrChar[i])));
             bits = (bits << 5) + charToBits(arrChar[i]);
         }
 
         int rem = b % 5;
         if(rem != 0){
             bits = bits << rem;
-            bits = bits + (charToBits(arrChar[b/5]) >> (5 - rem));
+            bits = bits + (charToBits(arrChar[b/5]) >>> (5 - rem));
         }
 
         return bits;

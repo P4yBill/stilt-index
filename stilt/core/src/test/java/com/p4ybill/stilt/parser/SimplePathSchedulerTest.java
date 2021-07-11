@@ -1,7 +1,7 @@
 package com.p4ybill.stilt.parser;
 
 import com.p4ybill.stilt.index.FlatKey;
-import com.p4ybill.stilt.index.Key;
+import com.p4ybill.stilt.index.FourDimensionalKey;
 
 import org.junit.Test;
 
@@ -18,7 +18,7 @@ public class SimplePathSchedulerTest {
                         .addMapper(new DateMappingFunction())
                         .build();
 
-        Key flatKey = new FlatKey(1, 50, 40, "cheqer", 1624194064, 100, 14);
+        FourDimensionalKey flatKey = new FlatKey(1, 50, 40, "cheqer", 1624194064, 100, 14);
 //       0000000000101000 : 40
 //       0000000000110010 : 50
 //       0001101000001011 : keyword prefix cheqer

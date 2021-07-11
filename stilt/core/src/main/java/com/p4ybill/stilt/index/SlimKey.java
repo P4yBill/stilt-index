@@ -1,6 +1,6 @@
 package com.p4ybill.stilt.index;
 
-public class SlimKey implements Key {
+public class SlimKey implements FourDimensionalKey {
     SlimCommon common;
     String keyword;
     int keywordFrequency;
@@ -44,5 +44,14 @@ public class SlimKey implements Key {
     @Override
     public int getTotalWordFrequency() {
         return this.common.getTotalWordFrequency();
+    }
+
+    @Override
+    public String toString() {
+        return "SlimKey{" +
+                "common=" + common.toString() +
+                ", keyword='" + keyword + '\'' +
+                ", keywordFrequency=" + keywordFrequency +
+                '}';
     }
 }

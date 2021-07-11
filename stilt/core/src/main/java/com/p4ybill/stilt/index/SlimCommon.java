@@ -34,4 +34,14 @@ public class SlimCommon {
     public int getTotalWordFrequency() {
         return totalWordFrequency;
     }
+
+    @Override
+    public String toString() {
+        return "SlimCommon{" +
+                "id=" + id +
+                ", y=" + y +
+                ", x=" + x +
+                ", date=" + date +
+                '}';
+    }
 }

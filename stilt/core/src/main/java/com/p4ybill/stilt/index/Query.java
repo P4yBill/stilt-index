@@ -91,7 +91,9 @@ public class Query {
         this.words = words;
     }
 
-    public boolean intersects(Key key) {
+    public boolean intersects(Key k) {
+        FourDimensionalKey key = (FourDimensionalKey)k;
+
         return (this.getMinX().isEmpty() || key.getX() >= this.getMinX().get()) &&
                 (this.getMinY().isEmpty() || key.getY() >= this.getMinY().get()) &&
                 (this.getMaxX().isEmpty() || key.getX() <= this.getMaxX().get()) &&
