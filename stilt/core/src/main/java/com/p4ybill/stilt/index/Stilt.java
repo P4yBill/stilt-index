@@ -1,20 +1,25 @@
 package com.p4ybill.stilt.index;
 
-import com.p4ybill.stilt.parser.DimensionMapper;
 import com.p4ybill.stilt.parser.PathScheduler;
 import com.p4ybill.stilt.store.LSMStorage;
 import com.p4ybill.stilt.utils.BinaryUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-public class Stilt<K> {
+public class Stilt<K extends Key> {
     private Node root;
     private int numberOfDimensions;
     private int length;
     private LSMStorage<String> lsmStorage;
     private int bitsPerDimension;
     private PathScheduler<K> pathScheduler;
+    private int counter = 0;
+    private long[] keysArrayTest;
+    private boolean test = false;
 
     public Stilt(int length, int numberOfDimensions) {
         this.numberOfDimensions = numberOfDimensions;
@@ -30,13 +35,65 @@ public class Stilt<K> {
         this.root = new NonLeafNode();
         this.lsmStorage = lsmStorage;
         this.pathScheduler = pathScheduler;
+
+//        this.counter = 0;
+//        this.test = true;
+//        this.keysArrayTest = new long[] {
+//                0b1000100000000010001110001100110011000010000011001100011100010101L,
+//                0b1000110000000010001110001100110011000010000011001100011100010101L,
+//                0b1000100000000010001110001100110011000010000011001100011100010101L,
+//                0b1000111000000010001110001100110011000010000011001100011100010101L,
+//                0b1000100000000010001110001100110011000010000011001100011100010101L,
+//                0b1000110000000010001110001100110011000010000011001100011100010101L,
+//                0b1000101000000010001110001100110011000010000011001100011100010101L,
+//                0b1000111100000010001110001100110011000010000011001100011100010101L,
+//                0b1000100000000010001110001100110011000010000011001100011100010101L,
+//                0b1000101100000010001110001100110011000010000011001100011100010101L,
+//                0b1000101000000010001110001100110011000010000011001100011100010101L,
+//                0b1000101100000010001110001100110011000010000011001100011100010101L,
+//                0b1000100100000010001110001100110011000010000011001100011100010101L,
+//                0b1000100100000010001110001100110011000010000011001100011100010101L,
+//                0b1000110000000010001110001100110011000010000011001100011100010101L,
+//                0b1000111111000010001110001100110011000010000011001100011100010101L,
+//                0b1000100001000010001110001100110011000010000011001100011100010101L,
+//                0b1000100011000010001110001100110011000010000011001100011100010101L,
+//                0b1000100101000010001110001100110011000010000011001100011100010101L,
+//                0b1000110001000010001110001100110011000010000011001100011100010101L,
+//                0b1000100001000010001110001100110011000010000011001100011100010101L,
+//                0b1000100000010010001110001100110011000010000011001100011100010101L,
+//                0b1000101000010010001110001100110011000010000011001100011100010101L,
+//                0b1000101100010010001110001100110011000010000011001100011100010101L,
+//                0b1000101111010010001110001100110011000010000011001100011100010101L,
+//                0b1000101111010010001110001100110011000010000011001100011100010101L,
+//                0b1000100111010010001110001100110011000010000011001100011100010101L,
+//                0b1000111111010010001110001100110011000010000011001100011100010101L,
+//                0b1000111001010010001110001100110011000010000011001100011100010101L,
+//                0b1000111001110010001110001100110011000010000011001100011100010101L,
+//        };
+    }
+
+    public void resetCounter(){
+        counter = 0;
     }
 
     public boolean insert(Node node, K key, int id) {
         if (node == null) {
             return false;
         }
-        long path = pathOf(key);
+        long path;
+
+        if(test){
+            path = keysArrayTest[counter++];
+        }else{
+            path = pathOf(key);
+        }
+
+//        if(key.getId() == 15){
+//            System.out.println("KEY path: " + counter++);
+//        }
+//        if(key.getId() == 15 && counter == 14){
+//            System.out.println("KEY path: " + counter);
+//        }
         int pathLen = this.length;
         while (path != 0 && pathLen != 0) {
             // TODO: Lock Node.
@@ -72,8 +129,9 @@ public class Stilt<K> {
         return new Query(this.bitsPerDimension);
     }
 
-    public List<K> rangeSearch(Query query) {
+    public Set<Integer> rangeSearch(Query query) {
         List<K> entries = new ArrayList<>();
+        Set<Integer> entryIds = new HashSet<>();
         initQueryRanges(query);
 
         RangeSearch<K> rangeSearch;
@@ -89,6 +147,7 @@ public class Stilt<K> {
                 rangeSearch = new RangeSearch<>(length, bitsPerDimension, numberOfDimensions);
                 List<K> l = rangeSearch.searchNode(root, query, 0, dr);
                 entries.addAll(l);
+                entryIds.addAll(l.stream().map(Key::getId).collect(Collectors.toSet()));
             }
         } else {
             // String dimension is ignored
@@ -97,9 +156,10 @@ public class Stilt<K> {
             rangeSearch = new RangeSearch<>(length, bitsPerDimension, numberOfDimensions);
             List<K> l = rangeSearch.searchNode(root, query, 0, dr);
             entries.addAll(l);
+            entryIds.addAll(l.stream().map(Key::getId).collect(Collectors.toSet()));
         }
 
-        return entries;
+        return entryIds;
     }
 
     public DimensionalRange initWithFullRange(Query query) {
@@ -161,18 +221,18 @@ public class Stilt<K> {
         int lengthO = edge.getLength();
         long pathO = edge.getPath();
 
-        int lengthC = BinaryUtils.clzBounded((path >> (pathLen - lengthO)) ^ pathO, lengthO);
+        int lengthC = BinaryUtils.clzBounded((path >>> (pathLen - lengthO)) ^ pathO, lengthO);
 
         Node nodeC = new NonLeafNode();
 
         edge.setChild(nodeC);
         edge.setLength(lengthC);
-        edge.setPath(pathO >> (lengthO - lengthC));
+        edge.setPath(pathO >>> (lengthO - lengthC));
 
         int lengthNew = lengthO - lengthC;
 
         Edge edgeNew = getRightSizedEdge(lengthNew);
-        int maskC = (1 << lengthNew) - 1;
+        long maskC = (1L << lengthNew) - 1;
 
         long edgeNewPath = pathO & maskC;
         edgeNew.setLength(lengthNew);

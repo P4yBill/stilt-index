@@ -1,5 +1,4 @@
 plugins {
-//    id 'java'
     id 'application'
 }
 
@@ -16,6 +15,9 @@ dependencies {
 
 run {
     standardInput = System.in
+    systemProperty "test_data_path", System.getProperty("test_data_path")
+    systemProperty "original_data_path", System.getProperty("original_data_path")
+    systemProperty "transformed_data_path", System.getProperty("transformed_data_path")
 }
 
 application {

@@ -1,9 +1,9 @@
 package com.p4ybill.stilt.parser;
 
-import com.p4ybill.stilt.index.Key;
+import com.p4ybill.stilt.index.FourDimensionalKey;
 import com.p4ybill.stilt.utils.Validators;
 
-public class SimplePathScheduler implements PathScheduler<Key> {
+public class SimplePathScheduler implements PathScheduler<FourDimensionalKey> {
     private int bitsPerDimension;
     private int numberOfDimensions;
     private int negationMask;
@@ -19,7 +19,7 @@ public class SimplePathScheduler implements PathScheduler<Key> {
     }
 
     @Override
-    public long getKey(Key data) {
+    public long getKey(FourDimensionalKey data) {
         long key = 0;
         Object[] keyValues = this.getKeyDimensionValues(data);
         int[] binaryStrings = new int[keyValues.length];
@@ -27,9 +27,6 @@ public class SimplePathScheduler implements PathScheduler<Key> {
             binaryStrings[i] = dimensionMapper.getMappingFunction(i).map(keyValues[i], bitsPerDimension);
             // applying mask to ensure that binary string has a specific length
             binaryStrings[i] &= this.negationMask;
-        }
-        for (int binary : binaryStrings) {
-            System.out.println(Integer.toBinaryString(binary));
         }
 
         for (int i = this.bitsPerDimension - 1; i >= 0; i--) {
@@ -42,7 +39,7 @@ public class SimplePathScheduler implements PathScheduler<Key> {
         return key;
     }
 
-    private Object[] getKeyDimensionValues(Key key) {
+    private Object[] getKeyDimensionValues(FourDimensionalKey key) {
         return new Object[]{key.getX(), key.getY(), key.getKeyword(), key.getDate()};
     }
 
