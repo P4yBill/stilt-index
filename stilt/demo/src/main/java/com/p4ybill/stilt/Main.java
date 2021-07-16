@@ -11,7 +11,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class Main {
     public static void main(String[] args) {
@@ -23,61 +22,67 @@ public class Main {
                 .addMapper(new DateMappingFunction())
                 .build();
         SimplePathScheduler pathScheduler = new SimplePathScheduler(4, 64, dimensionMapper);
-//
         Stilt<FourDimensionalKey> index = new Stilt<>(64, 4, null, pathScheduler);
-//
-//        Key flatKey = new FlatKey(1, 40, 50, "cheqer", 1624194064, 1, 1);
-//
-//        index.insert(flatKey, 1);
-//
-//        Key flatKey2 = new FlatKey(1, 40, 60, "cheqer", 1624194064, 1, 1);
-//
-//        index.insert(flatKey2, 1);
-//        Key flatKey3 = new FlatKey(1, 40, 50, "cheqeroputa", 1624194064, 1, 1);
-//        index.insert(flatKey3, 1);
 
-
-//        Key flatKey = new FlatKey(1, 50, 40, "cheqer", 1624194064, 1, 1);
-//
-//        index.insert(flatKey, 1);
-//
-//        Key flatKey2 = new FlatKey(1, 60, 40, "cheqer", 1624194064, 1, 1);
         System.out.println("Populating...");
+
         Instant start = Instant.now();
         populateIndex(index);
         Instant end = Instant.now();
+
         System.out.println("DONE!");
         System.out.println("Index construction time taken: " + Duration.between(start, end).toMillis() + "ms");
+
+        spatialQuery(index);
+    }
+
+    private static void spatialTextualQuery(Stilt<FourDimensionalKey> index){
         Query query = index.initQuery();
         query.setMinX(65530d);
         query.setMinY(730d);
         query.setMaxX(65535d);
         query.setMaxY(740d);
+
+//        query.setMinTimestamp(3823L);
+//        query.setMaxTimestamp(3825L);
+
         List<String> words = new ArrayList<>();
-//        words.add("air_conditioning");
-//        words.add("wedding_services");
-//        words.add("internet_free");
-//        words.add("internet_wireless");
+        words.add("air_conditioning");
+        words.add("wedding_services");
+        words.add("internet_free");
+        words.add("internet_wireless");
         query.setWords(words);
-//
-//        query.setMinTimestamp(1624191000L);
-//        query.setMaxTimestamp(1624197000L);
 
-//        List<Key> res = index.rangeSearch(query);
-//        for(Key key : res){
-//            System.out.println(key.toString());
-//        }
-////
-//        System.out.println(res.size());
-
-        start = Instant.now();
-        Set<Integer> ids = index.rangeSearch(query);
-        end = Instant.now();
+        Instant start = Instant.now();
+//        Set<Integer> ids = index.rangeSearch(query);
+        List<FourDimensionalKey> keys = index.rangeSearch(query);
+        Instant end = Instant.now();
         System.out.println("Range Search took: " + Duration.between(start, end).toMillis() + "ms");
+        System.out.println("Results: " + keys.size());
 
-//        ids.forEach(System.out::println);
-        System.out.println(ids.size());
+        keys.forEach(System.out::println);
+        keys.forEach(key -> System.out.println(key.getId()));
+    }
 
+    private static void spatialQuery(Stilt<FourDimensionalKey> index){
+        Query query = index.initQuery();
+//        query.setMinX(848d);
+//        query.setMinY(47176d);
+//        query.setMaxX(851d);
+//        query.setMaxY(47178d);
+
+        query.setMinTimestamp(3823L);
+        query.setMaxTimestamp(3825L);
+
+        Instant start = Instant.now();
+        List<FourDimensionalKey> keys = index.rangeSearch(query);
+        Instant end = Instant.now();
+        System.out.println("Range Search took: " + Duration.between(start, end).toMillis() + "ms");
+        System.out.println("Results: " + keys.size());
+
+//        keys.forEach(System.out::println);
+//        keys.forEach(key -> System.out.println(key.getId()));
+        keys.forEach(key -> System.out.println(key.getX()));
     }
 
     private static void populateIndex(Stilt<FourDimensionalKey> stilt){

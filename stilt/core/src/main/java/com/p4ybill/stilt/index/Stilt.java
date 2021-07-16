@@ -75,7 +75,7 @@ public class Stilt<K extends Key> {
         return new Query(this.bitsPerDimension);
     }
 
-    public Set<Integer> rangeSearch(Query query) {
+    public List<K> rangeSearch(Query query) {
         List<K> entries = new ArrayList<>();
         Set<Integer> entryIds = new HashSet<>();
         initQueryRanges(query);
@@ -105,7 +105,7 @@ public class Stilt<K extends Key> {
             entryIds.addAll(l.stream().map(Key::getId).collect(Collectors.toSet()));
         }
 
-        return entryIds;
+        return entries;
     }
 
     public DimensionalRange initWithFullRange(Query query) {

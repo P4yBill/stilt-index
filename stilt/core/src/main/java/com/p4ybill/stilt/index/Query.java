@@ -102,7 +102,7 @@ public class Query {
                 (this.getMinTimestamp().isEmpty() || key.getDate() >= this.getMinTimestamp().get()) &&
                 (this.getMaxTimestamp().isEmpty() || key.getDate() <= this.getMaxTimestamp().get()) &&
 
-                (this.getWord().isEmpty()) || this.getWord().get().equals(key.getKeyword());
+                (this.getWord().isEmpty() || this.getWord().get().equals(key.getKeyword()));
 
     }
 

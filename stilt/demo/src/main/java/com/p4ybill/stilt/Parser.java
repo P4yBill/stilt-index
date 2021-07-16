@@ -16,24 +16,31 @@ public class Parser {
         try {
             bufferedReader = new BufferedReader(new FileReader(dataFile));
             String sLine = "";
+            int id = 1;
             while ((sLine = bufferedReader.readLine()) != null) {
-                String[] components = sLine.split("[|]");
-                int id = Integer.parseInt(components[0]);
+                String[] components = sLine.split("[" + IndexUtils.DATA_COMPONENTS_SEPARATOR + "]");
 
-                double y = Double.parseDouble(components[4]);
-                double x = Double.parseDouble(components[5]);
-                long timestamp = 1624194064;
-                if(components.length < 7){
-                    FlatKey flatKey = new FlatKey(id, y, x, "", timestamp, 1, 1);
-                    index.insert(flatKey, id);
-                }else{
-                    String keywords = components[6];
-                    List<String> listKeywords = Arrays.asList(keywords.split(","));
-                    SlimCommon slimCommon = new SlimCommon(id, y, x, timestamp, listKeywords.size());
-                    for (String word : listKeywords) {
-                        SlimKey slimKey = new SlimKey(slimCommon, word, 1);
-                        index.insert(slimKey, id);
+                double y = Double.parseDouble(components[IndexUtils.DATA_Y_INDEX]);
+                double x = Double.parseDouble(components[IndexUtils.DATA_X_INDEX]);
+                double timestamp = Double.parseDouble(components[IndexUtils.DATA_DATE_INDEX]);
+
+                boolean hasKeywords = components.length == 4;
+                if (hasKeywords) {
+                    String keywords = components[IndexUtils.DATA_TEXTUAL_INDEX];
+                    List<String> listKeywords = Arrays.asList(keywords.split(IndexUtils.DATA_TEXTUAL_SEPARATOR));
+                    if (listKeywords.size() == 1) {
+                        // there is one word so FlatKey is enough
+                        FlatKey flatKey = new FlatKey(id, y, x, listKeywords.get(0), (long)timestamp, 1, 1);
+                        index.insert(flatKey, id);
+                    } else {
+                        // there are more words so we should use SlimCommon
+                        SlimCommon slimCommon = new SlimCommon(id, y, x, (long)timestamp, listKeywords.size());
+                        for (String word : listKeywords) {
+                            SlimKey slimKey = new SlimKey(slimCommon, word, 1);
+                            index.insert(slimKey, id);
+                        }
                     }
+                    id++;
                 }
             }
         } catch (IOException e) {

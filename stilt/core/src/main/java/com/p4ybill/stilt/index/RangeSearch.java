@@ -99,8 +99,6 @@ class RangeSearch<K extends Key> {
                 dimensionalRange.setRange(v, d);
             }
         }
-//        012301230123012301230123012301230123012301230123
-//        000000000000001000110000001000000000000011001000
 
         if (rangeIntersectsQuery(dimensionalRange, query)) {
             depth += (length - 1);
