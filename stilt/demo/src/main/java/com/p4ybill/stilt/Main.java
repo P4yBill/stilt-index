@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class Main {
     public static void main(String[] args) {
@@ -53,36 +54,30 @@ public class Main {
         words.add("internet_wireless");
         query.setWords(words);
 
+        queryIndex(index, query);
+    }
+
+    private static void spatialQuery(Stilt<FourDimensionalKey> index){
+        Query query = index.initQuery();
+        query.setMinX(848d);
+        query.setMinY(47176d);
+        query.setMaxX(851d);
+        query.setMaxY(47178d);
+
+//        query.setMinTimestamp(3823L);
+//        query.setMaxTimestamp(3825L);
+
+        queryIndex(index, query);
+    }
+
+    private static void queryIndex(Stilt<FourDimensionalKey> index, Query query){
         Instant start = Instant.now();
-//        Set<Integer> ids = index.rangeSearch(query);
-        List<FourDimensionalKey> keys = index.rangeSearch(query);
+        Set<Integer> keys = index.rangeSearch(query);
         Instant end = Instant.now();
         System.out.println("Range Search took: " + Duration.between(start, end).toMillis() + "ms");
         System.out.println("Results: " + keys.size());
 
         keys.forEach(System.out::println);
-        keys.forEach(key -> System.out.println(key.getId()));
-    }
-
-    private static void spatialQuery(Stilt<FourDimensionalKey> index){
-        Query query = index.initQuery();
-//        query.setMinX(848d);
-//        query.setMinY(47176d);
-//        query.setMaxX(851d);
-//        query.setMaxY(47178d);
-
-        query.setMinTimestamp(3823L);
-        query.setMaxTimestamp(3825L);
-
-        Instant start = Instant.now();
-        List<FourDimensionalKey> keys = index.rangeSearch(query);
-        Instant end = Instant.now();
-        System.out.println("Range Search took: " + Duration.between(start, end).toMillis() + "ms");
-        System.out.println("Results: " + keys.size());
-
-//        keys.forEach(System.out::println);
-//        keys.forEach(key -> System.out.println(key.getId()));
-        keys.forEach(key -> System.out.println(key.getX()));
     }
 
     private static void populateIndex(Stilt<FourDimensionalKey> stilt){
