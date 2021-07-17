@@ -20,11 +20,14 @@ public class Parser {
             while ((sLine = bufferedReader.readLine()) != null) {
                 String[] components = sLine.split("[" + IndexUtils.DATA_COMPONENTS_SEPARATOR + "]");
 
+                if(IndexUtils.DATA_ID_INDEX != -1){
+                    id = Integer.parseInt(components[IndexUtils.DATA_ID_INDEX]);
+                }
                 double y = Double.parseDouble(components[IndexUtils.DATA_Y_INDEX]);
                 double x = Double.parseDouble(components[IndexUtils.DATA_X_INDEX]);
                 double timestamp = Double.parseDouble(components[IndexUtils.DATA_DATE_INDEX]);
 
-                boolean hasKeywords = components.length == 4;
+                boolean hasKeywords = components.length == IndexUtils.DATA_LINE_COMPONENTS_LENGTH;
                 if (hasKeywords) {
                     String keywords = components[IndexUtils.DATA_TEXTUAL_INDEX];
                     List<String> listKeywords = Arrays.asList(keywords.split(IndexUtils.DATA_TEXTUAL_SEPARATOR));
@@ -40,7 +43,9 @@ public class Parser {
                             index.insert(slimKey, id);
                         }
                     }
-                    id++;
+                    if(IndexUtils.DATA_ID_INDEX == -1){
+                        id++;
+                    }
                 }
             }
         } catch (IOException e) {

@@ -42,16 +42,20 @@ The following variables are used in `Parser` and `DataTransformer`.
 
     public static final String DATA_TEXTUAL_SEPARATOR = ",";
     public static final String DATA_COMPONENTS_SEPARATOR = "|";
-    public static final int DATA_X_INDEX = 0;
-    public static final int DATA_Y_INDEX = 1;
-    public static final int DATA_DATE_INDEX = 2;
-    public static final int DATA_TEXTUAL_INDEX = 3;
+    public static final int DATA_ID_INDEX = 0;
+    public static final int DATA_X_INDEX = 1;
+    public static final int DATA_Y_INDEX = 2;
+    public static final int DATA_DATE_INDEX = 3;
+    public static final int DATA_TEXTUAL_INDEX = 4;
+    public static final int DATA_LINE_COMPONENTS_LENGTH = 5;
 
 *In order to parse or transform data, a `.txt` file need to be passed with lines(see below) concatenated with `newline`(`\n`),
-components with `DATA_COMPONENTS_SEPARATOR` and keywords with `DATA_TEXTUAL_SEPARATOR`. Indexes of components need to match the `INDEX` variables.*
+components with `DATA_COMPONENTS_SEPARATOR` and keywords with `DATA_TEXTUAL_SEPARATOR`.`DATA_LINE_COMPONENTS_LENGTH` should also be given which is the number of components 
+concatenated with `DATA_COMPONENTS_SEPARATOR`, Indexes of components need to match the `INDEX` variables.*
 
-*`DATA_{d}_INDEX` with `{d} belongs to {X, Y, DATE, TEXTUAL}`*
+*`DATA_{d}_INDEX` with `{d} belongs to {ID, X, Y, DATE, TEXTUAL}`*
 
+`DATA_ID_INDEX` is not mandatory. Can also be `-1` if no `ID` index is present. If that happens, an auto-increment id will be given, starting from `1`.
 
 ##### Example of a file using the variables above.
 
@@ -73,7 +77,7 @@ In test file:
  
  Spatial components were normalized in (0, 65535) range.
  
- Calling the `transformData()` function in main and passing the following System properties:
+ Calling the `transformData()` function in main and passing the following System properties(`-Dproperty=value`):
  
 - `original_data_path` (path of hotels-v1 data)
 - `transformed_data_path` (output file for normalized data)
@@ -84,9 +88,16 @@ We normalized the data in `[0, 65535]` range as we used `16bits` for each dimens
  
 ### Using test data(`Parser`)
   Located under `stilt:demo` package. 
-  
-  It can be used for populating the data. `Env Variables` are needed as described in ***Parser And DataTransformer*** section
+It can be used for populating the data. `Env Variables` are needed as described in ***Parser And DataTransformer*** section
 
+  - `test_data_path` System property is needed, which tells the `Parser` which file to use.
+
+### Using Brute Force test class(`BruteForceTester`)
+  Located under `stilt:demo` package. 
+  Populates the index with the parser as described, and does a range query given a `Query` `query` and then checks if the results obtained from range query are correct.
+  
+  - `bruteForce_test_path` System property is needed, which tells the `BruteForceTester` and `Parser` which file to use.
+    
 
 ### Getting started(example)
 The following example can be found in `stilt:demo:Main.java` file
@@ -126,8 +137,10 @@ The following example can be found in `stilt:demo:Main.java` file
 
     $ gradlew build
     $ gradlew stilt:demo:run
-
- To pass the file path of test data and use `Parser` `test_data_path` system property has to be included in the run command:
+ 
+ Passing a System property: `... -Dproperty=value`
+ 
+ To pass the file path of test data and use `Parser` `test_data_path` System property has to be included in the run command:
  
  `$ gradlew stilt:demo:run -Dtest_data_path=path`
 

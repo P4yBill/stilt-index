@@ -38,6 +38,7 @@ public class Stilt<K extends Key> {
         if (node == null) {
             return false;
         }
+
         long path = pathOf(key);
 
         int pathLen = this.length;
@@ -75,15 +76,15 @@ public class Stilt<K extends Key> {
         return new Query(this.bitsPerDimension);
     }
 
-    public List<K> rangeSearch(Query query) {
-        List<K> entries = new ArrayList<>();
+    public Set<Integer> rangeSearch(Query query) {
+//        List<K> entries = new ArrayList<>();
         Set<Integer> entryIds = new HashSet<>();
         initQueryRanges(query);
 
         RangeSearch<K> rangeSearch;
         DimensionalRange dr;
 
-        if (query.getWords().isPresent()) {
+        if (query.getWords().isPresent() && query.getWords().get().size() > 0) {
             List<String> words = query.getWords().get();
             for (String w : words) {
                 query.setWord(w);
@@ -92,7 +93,7 @@ public class Stilt<K extends Key> {
                 dr = initWithFullRange(query);
                 rangeSearch = new RangeSearch<>(length, bitsPerDimension, numberOfDimensions);
                 List<K> l = rangeSearch.searchNode(root, query, 0, dr);
-                entries.addAll(l);
+//                entries.addAll(l);
                 entryIds.addAll(l.stream().map(Key::getId).collect(Collectors.toSet()));
             }
         } else {
@@ -101,11 +102,11 @@ public class Stilt<K extends Key> {
             dr = initWithFullRange(query);
             rangeSearch = new RangeSearch<>(length, bitsPerDimension, numberOfDimensions);
             List<K> l = rangeSearch.searchNode(root, query, 0, dr);
-            entries.addAll(l);
+//            entries.addAll(l);
             entryIds.addAll(l.stream().map(Key::getId).collect(Collectors.toSet()));
         }
 
-        return entries;
+        return entryIds;
     }
 
     public DimensionalRange initWithFullRange(Query query) {

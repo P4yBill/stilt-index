@@ -32,10 +32,12 @@ class RangeSearch<K extends Key> {
             if (v == null) {
                 // dimension ignored
                 if (leftEdge != null) {
-                    l = searchEdge(node.getLeftEdge(), query, depth, dimensionalRange);
+                    DimensionalRange clonedRange = DimensionalRange.clone(dimensionalRange);
+                    l = searchEdge(node.getLeftEdge(), query, depth, clonedRange);
                 }
                 if (rightEdge != null) {
-                    u = searchEdge(node.getRightEdge(), query, depth, dimensionalRange);
+                    DimensionalRange clonedRange = DimensionalRange.clone(dimensionalRange);
+                    u = searchEdge(node.getRightEdge(), query, depth, clonedRange);
                 }
             } else {
                 Range queryDimensionRange = query.getRangeForDimension(dimension);
@@ -84,6 +86,7 @@ class RangeSearch<K extends Key> {
         long path = edge.getPath();
         int length = edge.getLength();
         int depth2;
+
         for (int i = 0; i < length - 1; i++) {
             depth2 = depth + i;
             int d = depth2 % 4;
